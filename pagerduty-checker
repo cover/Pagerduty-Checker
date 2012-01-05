@@ -1,0 +1,45 @@
+#!/usr/local/bin/ruby
+
+require 'rubygems'
+require 'json'
+require 'net/http'
+require 'net/https'
+require 'resolv-replace'
+require 'ping'
+
+wait = 1
+path = File.dirname(__FILE__)
+
+abort "Create the #{path}/config.rb file first (something like config.rb.example)!" unless File.exist?("#{path}/config.rb")
+require "#{path}/config.rb"
+
+while true
+  begin
+    if Ping.pingecho "google.com", 1, 80
+      http = Net::HTTP.new("#{PAGERDUTY_SUBDOMAIN}.pagerduty.com", 443)
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      req = Net::HTTP::Get.new('/api/v1/incidents?status=triggered')
+      req.basic_auth PAGERDUTY_EMAIL, PAGERDUTY_PASSWORD
+      response = http.request(req)
+      incidents = JSON.parse(response.body)["incidents"]
+      wait = 1
+      if incidents.size > 0
+        names = incidents.map { |i| i["service"]["name"] }
+        `kdialog --display :0 --passivepopup 'PAGERDUTY: #{names.join(', ')} DOWN !!!' 60`
+        `amixer set -c 0 Master 30 unmute && amixer set -c 0 Headphone 1000 unmute && amixer set -c 0 PCM 1000 unmute && amixer set -c 0 Front 1000 unmute`
+        `mplayer #{path}/alert.ogg`
+        sleep 60
+      else
+        sleep 15
+      end
+    else
+      wait = wait * 2
+      sleep wait
+    end
+  rescue => e
+    File.open("#{path}/errors.log", 'a') { |f| f.write("#{Time.now} - line ##{e.backtrace.first.split(':')[1]} - #{e.inspect}\n") }
+    wait = wait * 2
+    sleep wait
+  end
+end

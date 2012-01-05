@@ -1,0 +1,3 @@
+PAGERDUTY_EMAIL     = 'email@domain.tld'
+PAGERDUTY_PASSWORD  = 'password'
+PAGERDUTY_SUBDOMAIN = 'subdomain'
