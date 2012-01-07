@@ -6,9 +6,10 @@ require 'net/http'
 require 'net/https'
 require 'resolv-replace'
 require 'ping'
+require 'pathname'
 
 wait = 1
-path = File.dirname(__FILE__)
+path = Pathname.new(__FILE__).realpath.dirname
 
 abort "Create the #{path}/config.rb file first (something like config.rb.example)!" unless File.exist?("#{path}/config.rb")
 require "#{path}/config.rb"
