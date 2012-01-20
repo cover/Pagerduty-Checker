@@ -3,14 +3,16 @@ Pagerduty Checker
 
 A very simple ruby script to check when something bad happens on Pagerduty and get notified immediately.
 
-KDE notification only for now (using kdialog), feel free to fork this and add support for other notification systems.
+It uses the standard Ubuntu (and derivatives) notification system through notify-send, so make sure to have it installed. Feel free to fork this and add support for other notification systems.
 
 Sound is from http://www.freesound.org/people/Nasse/sounds/91290/
+
+PagerDuty logo is owned by PagerDuty Inc.
 
 Requirements
 ------------
 
-KDE/kdialog, amixer, mplayer
+notify-send, amixer, mplayer
 
 Installation
 ------------

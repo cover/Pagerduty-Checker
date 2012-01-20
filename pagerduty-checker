@@ -1,4 +1,4 @@
-#!/usr/local/bin/ruby
+#!/usr/bin/ruby
 
 require 'rubygems'
 require 'json'
@@ -8,11 +8,12 @@ require 'resolv-replace'
 require 'ping'
 require 'pathname'
 
-wait = 1
 path = Pathname.new(__FILE__).realpath.dirname
 
 abort "Create the #{path}/config.rb file first (something like config.rb.example)!" unless File.exist?("#{path}/config.rb")
 require "#{path}/config.rb"
+
+wait = 1
 
 while true
   begin
@@ -27,7 +28,7 @@ while true
       wait = 1
       if incidents.size > 0
         names = incidents.map { |i| i["service"]["name"] }
-        `kdialog --display :0 --passivepopup 'PAGERDUTY: #{names.join(', ')} DOWN !!!' 60`
+        `notify-send -u critical -t 15000 -i #{path}/pagerduty.png -c pagerduty "PagerDuty Checker" "SERVICE(S) DOWN:\n\n#{names.join(', ')}\n\nSign in at http://#{PAGERDUTY_SUBDOMAIN}.pagerduty.com"`
         `amixer set -c 0 Master 30 unmute && amixer set -c 0 Headphone 1000 unmute && amixer set -c 0 PCM 1000 unmute && amixer set -c 0 Front 1000 unmute`
         `mplayer #{path}/alert.ogg`
         sleep 60
